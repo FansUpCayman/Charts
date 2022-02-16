@@ -196,10 +196,10 @@ open class ChartDataSet: ChartBaseDataSet
     /// An empty array if no Entry object at that index.
     open override func entriesForXValue(_ xValue: Double) -> [ChartDataEntry]
     {
-        let match: (ChartDataEntry) -> Bool = { $0.x == xValue }
+        let match: (ChartDataEntry) -> Bool = { $0.x >= xValue }
         let i = partitioningIndex(where: match)
-        guard i < endIndex else { return [] }
-        return self[i...].prefix(while: match)
+        guard i < endIndex && self[i].x == xValue else { return [] }
+        return self[i...].prefix(while: { $0.x == xValue })
     }
     
     /// - Parameters:
@@ -234,7 +234,17 @@ open class ChartDataSet: ChartBaseDataSet
             }
 
         case .closest:
-            break
+            if(closest > startIndex){
+                let closestXIndex = closest
+                formIndex(before: &closest)
+                let value = self[closest]
+
+                // If the x value is closer to the original x index revert closest otherwise fall through
+                if abs(value.x - xValue) > abs(closestXValue - xValue)
+                {
+                    closest = closestXIndex
+                }
+            }
         }
 
         // Search by closest to y-value

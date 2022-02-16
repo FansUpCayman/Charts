@@ -82,7 +82,7 @@ open class XAxisRenderer: NSObject, AxisRenderer
         // Normalize interval
         let intervalMagnitude = pow(10.0, Double(Int(log10(interval)))).roundedToNextSignificant()
         let intervalSigDigit = Int(interval / intervalMagnitude)
-        if intervalSigDigit > 5
+        if intervalSigDigit > 5, !axis.granularityEnabled
         {
             // Use one order of magnitude higher, to avoid intervals like 0.9 or 90
             interval = floor(10.0 * Double(intervalMagnitude))
