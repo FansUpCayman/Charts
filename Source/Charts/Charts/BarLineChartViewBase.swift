@@ -549,8 +549,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
             }
             else
             {
-                lastHighlighted = h
-                highlightValue(h, callDelegate: true)
+                lastHighlighted = highlightValue(h, callDelegate: true) ? h : nil
             }
         }
     }
@@ -767,8 +766,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
                 
                 if h != lastHighlighted
                 {
-                    self.lastHighlighted = h
-                    self.highlightValue(h, callDelegate: true)
+                    self.lastHighlighted = self.highlightValue(h, callDelegate: true) ? h : nil
                 }
             }
         }
