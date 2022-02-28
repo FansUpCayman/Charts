@@ -45,6 +45,8 @@ public protocol ChartViewDelegate
 
     // Callbacks when Animator stops animating
     @objc optional func chartView(_ chartView: ChartViewBase, animatorDidStop animator: Animator)
+    
+    @objc optional func chartView(_ chartView: ChartViewBase, shouldSelectEntry entry: ChartDataEntry) -> Bool
 }
 
 open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
@@ -510,52 +512,48 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
     ///
     /// - Parameters:
     ///   - highlight: contains information about which entry should be highlighted
-    @objc open func highlightValue(_ highlight: Highlight?)
+    @objc open func highlightValue(_ highlight: Highlight?) -> Bool
     {
         highlightValue(highlight, callDelegate: false)
     }
 
     /// Highlights the value selected by touch gesture.
-    @objc open func highlightValue(_ highlight: Highlight?, callDelegate: Bool)
+    @objc open func highlightValue(_ highlight: Highlight?, callDelegate: Bool) -> Bool
     {
         var entry: ChartDataEntry?
-        var h = highlight
+        var didSelect = false
         
-        if h == nil
-        {
+        if let highlight = highlight {
+            // set the indices to highlight
+            
+            entry = _data?.entryForHighlight(highlight)
+            if let entry = entry
+            {
+                if delegate?.chartView?(self, shouldSelectEntry: entry) == false {
+                    self.lastHighlighted = nil
+                    _indicesToHighlight.removeAll(keepingCapacity: false)
+                } else {
+                    _indicesToHighlight = [highlight]
+                    didSelect = true
+                    if callDelegate {
+                        delegate?.chartValueSelected?(self, entry: entry, highlight: highlight)
+                    }
+                }
+            } else {
+                _indicesToHighlight.removeAll(keepingCapacity: false)
+            }
+        } else {
             self.lastHighlighted = nil
             _indicesToHighlight.removeAll(keepingCapacity: false)
         }
-        else
-        {
-            // set the indices to highlight
-            entry = _data?.entryForHighlight(h!)
-            if entry == nil
-            {
-                h = nil
-                _indicesToHighlight.removeAll(keepingCapacity: false)
-            }
-            else
-            {
-                _indicesToHighlight = [h!]
-            }
-        }
         
-        if callDelegate, let delegate = delegate
-        {
-            if let h = h
-            {
-                // notify the listener
-                delegate.chartValueSelected?(self, entry: entry!, highlight: h)
-            }
-            else
-            {
-                delegate.chartValueNothingSelected?(self)
-            }
+        if callDelegate, !didSelect {
+            delegate?.chartValueNothingSelected?(self)
         }
         
         // redraw the chart
         setNeedsDisplay()
+        return didSelect
     }
     
     /// - Returns: The Highlight object (contains x-index and DataSet index) of the

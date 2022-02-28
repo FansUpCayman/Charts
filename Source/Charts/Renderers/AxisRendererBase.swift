@@ -118,7 +118,7 @@ open class AxisRendererBase: Renderer
         // Normalize interval
         let intervalMagnitude = pow(10.0, Double(Int(log10(interval)))).roundedToNextSignficant()
         let intervalSigDigit = Int(interval / intervalMagnitude)
-        if intervalSigDigit > 5
+        if intervalSigDigit > 5, !axis.granularityEnabled
         {
             // Use one order of magnitude higher, to avoid intervals like 0.9 or 90
             // if it's 0.0 after floor(), we use the old value
