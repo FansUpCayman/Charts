@@ -140,7 +140,7 @@ class BarChartViewController: DemoBaseViewController {
             chartView.data = data
         }
         set1.barBorderWidth = 3
-        set1.barBorderColor =  .green
+        set1.barBorderColor =  .red.withAlphaComponent(0.5)
         set1.highlightBorderWidth = 3
         set1.highlightBorderColor = .red
         
