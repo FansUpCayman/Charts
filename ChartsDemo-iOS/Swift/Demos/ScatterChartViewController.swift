@@ -94,6 +94,7 @@ class ScatterChartViewController: DemoBaseViewController {
         set1.setScatterShape(.square)
         set1.setColor(ChartColorTemplates.colorful()[0])
         set1.scatterShapeSize = 8
+        set1.highlightIcon = UIImage(named: "icon")
         
         let set2 = ScatterChartDataSet(entries: values2, label: "DS 2")
         set2.setScatterShape(.circle)
@@ -101,6 +102,8 @@ class ScatterChartViewController: DemoBaseViewController {
         set2.scatterShapeHoleRadius = 3.5
         set2.setColor(ChartColorTemplates.colorful()[1])
         set2.scatterShapeSize = 8
+        
+        set2.highlightIcon = UIImage(named: "icon")
         
         let set3 = ScatterChartDataSet(entries: values3, label: "DS 3")
         set3.setScatterShape(.cross)

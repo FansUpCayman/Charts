@@ -97,7 +97,7 @@ class LineChart1ViewController: DemoBaseViewController {
         sliderY.value = 100
         slidersValueChanged(nil)
         
-        chartView.animate(xAxisDuration: 2.5)
+//        chartView.animate(xAxisDuration: 2.5)
     }
 
     override func updateChartData() {
@@ -120,6 +120,7 @@ class LineChart1ViewController: DemoBaseViewController {
         
         set1.lineDashLengths = [5, 2.5]
         set1.highlightLineDashLengths = [5, 2.5]
+        set1.highlightIcon = UIImage(named: "icon")
         set1.setColor(.black)
         set1.setCircleColor(.black)
         set1.lineWidth = 1

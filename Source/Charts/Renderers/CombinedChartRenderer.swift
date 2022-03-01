@@ -12,8 +12,9 @@
 import Foundation
 import CoreGraphics
 
-open class CombinedChartRenderer: DataRenderer
+open class CombinedChartRenderer: DataRenderer, HighlightIconRenderer
 {
+    
     @objc open weak var chart: CombinedChartView?
     
     /// if set to true, all values are drawn above their bars, instead of below their top
@@ -158,6 +159,45 @@ open class CombinedChartRenderer: DataRenderer
             let dataIndices = indices.filter{ $0.dataIndex == dataIndex || $0.dataIndex == -1 }
             
             renderer.drawHighlighted(context: context, indices: dataIndices)
+        }
+    }
+    
+    public func drawHighlightIcons(context: CGContext, indices: [Highlight]) {
+        for renderer in _renderers {
+            guard renderer is HighlightIconRenderer else { continue }
+            var data: ChartData?
+            
+            if renderer is BarChartRenderer
+            {
+                data = (renderer as! BarChartRenderer).dataProvider?.barData
+            }
+            else if renderer is LineChartRenderer
+            {
+                data = (renderer as! LineChartRenderer).dataProvider?.lineData
+            }
+            else if renderer is CandleStickChartRenderer
+            {
+                data = (renderer as! CandleStickChartRenderer).dataProvider?.candleData
+            }
+            else if renderer is ScatterChartRenderer
+            {
+                data = (renderer as! ScatterChartRenderer).dataProvider?.scatterData
+            }
+            else if renderer is BubbleChartRenderer
+            {
+                data = (renderer as! BubbleChartRenderer).dataProvider?.bubbleData
+            }
+            
+            let dataIndex: Int? = {
+                guard let data = data else { return nil }
+                return (chart?.data as? CombinedChartData)?
+                    .allData
+                    .firstIndex(of: data)
+            }()
+            
+            let dataIndices = indices.filter{ $0.dataIndex == dataIndex || $0.dataIndex == -1 }
+            
+            (renderer as? HighlightIconRenderer)?.drawHighlightIcons(context: context, indices: dataIndices)
         }
     }
 

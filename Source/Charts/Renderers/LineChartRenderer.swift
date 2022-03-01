@@ -12,7 +12,7 @@
 import Foundation
 import CoreGraphics
 
-open class LineChartRenderer: LineRadarRenderer
+open class LineChartRenderer: LineRadarRenderer, HighlightIconRenderer
 {
     // TODO: Currently, this nesting isn't necessary for LineCharts. However, it will make it much easier to add a custom rotor
     // that navigates between datasets.
@@ -736,8 +736,54 @@ open class LineChartRenderer: LineRadarRenderer
             
             high.setDraw(pt: pt)
             
+            
             // draw the lines
             drawHighlightLines(context: context, point: pt, set: set)
+            
+        }
+        
+        context.restoreGState()
+    }
+    
+    open func drawHighlightIcons(context: CGContext, indices: [Highlight]) {
+        guard
+            let dataProvider = dataProvider,
+            let lineData = dataProvider.lineData,
+            !indices.isEmpty
+            else { return }
+        
+        let chartXMax = dataProvider.chartXMax
+        
+        context.saveGState()
+        
+        for high in indices
+        {
+            guard let set = lineData.getDataSetByIndex(high.dataSetIndex) as? ILineChartDataSet,
+                  set.isHighlightEnabled,
+                  let icon = set.highlightIcon
+                else { continue }
+            
+            guard let e = set.entryForXValue(high.x, closestToY: high.y) else { continue }
+            
+            if !isInBoundsX(entry: e, dataSet: set)
+            {
+                continue
+            }
+            let x = e.x // get the x-position
+            let y = e.y * Double(animator.phaseY)
+            
+            if x > chartXMax * animator.phaseX
+            {
+                continue
+            }
+            
+            let trans = dataProvider.getTransformer(forAxis: set.axisDependency)
+            
+            let pt = trans.pixelForValues(x: x, y: y)
+            let size = icon.size
+            let rect = CGRect(origin: pt.applying(.init(translationX: -size.width/2, y: -size.height/2)), size: size)
+            icon.draw(in: rect)
+            
         }
         
         context.restoreGState()

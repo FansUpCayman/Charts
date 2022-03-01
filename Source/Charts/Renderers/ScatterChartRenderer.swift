@@ -12,7 +12,7 @@
 import Foundation
 import CoreGraphics
 
-open class ScatterChartRenderer: LineScatterCandleRadarRenderer
+open class ScatterChartRenderer: LineScatterCandleRadarRenderer, HighlightIconRenderer
 {
     @objc open weak var dataProvider: ScatterChartDataProvider?
     
@@ -242,6 +242,50 @@ open class ScatterChartRenderer: LineScatterCandleRadarRenderer
             
             // draw the lines
             drawHighlightLines(context: context, point: pt, set: set)
+        }
+        
+        context.restoreGState()
+    }
+    
+    open func drawHighlightIcons(context: CGContext, indices: [Highlight]) {
+        guard
+            let dataProvider = dataProvider,
+            let scatterData = dataProvider.scatterData,
+            !indices.isEmpty
+            else { return }
+        
+        let chartXMax = dataProvider.chartXMax
+        
+        context.saveGState()
+        
+        for high in indices
+        {
+            guard let set = scatterData.getDataSetByIndex(high.dataSetIndex) as? IScatterChartDataSet,
+                  set.isHighlightEnabled,
+                  let icon = set.highlightIcon
+                else { continue }
+            
+            guard let e = set.entryForXValue(high.x, closestToY: high.y) else { continue }
+            
+            if !isInBoundsX(entry: e, dataSet: set)
+            {
+                continue
+            }
+            let x = e.x // get the x-position
+            let y = e.y * Double(animator.phaseY)
+            
+            if x > chartXMax * animator.phaseX
+            {
+                continue
+            }
+            
+            let trans = dataProvider.getTransformer(forAxis: set.axisDependency)
+            
+            let pt = trans.pixelForValues(x: x, y: y)
+            let size = icon.size
+            let rect = CGRect(origin: pt.applying(.init(translationX: -size.width/2, y: -size.height/2)), size: size)
+            icon.draw(in: rect)
+            
         }
         
         context.restoreGState()

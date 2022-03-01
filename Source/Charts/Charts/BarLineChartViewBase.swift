@@ -246,14 +246,19 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
         }
         
         // if highlighting is enabled
-        if (valuesToHighlight())
-        {
+        if (valuesToHighlight()) {
             renderer.drawHighlighted(context: context, indices: _indicesToHighlight)
         }
         
         context.restoreGState()
         
+        // drawExtras draws stuff like data point circles in line charts
+        // which should be above highlight lines and below highlight icons
         renderer.drawExtras(context: context)
+        
+        if (valuesToHighlight()) {
+            (renderer as? HighlightIconRenderer)?.drawHighlightIcons(context: context, indices: _indicesToHighlight)
+        }
         
         if _xAxis.isEnabled && !_xAxis.isDrawLimitLinesBehindDataEnabled
         {

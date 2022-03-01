@@ -90,6 +90,11 @@ class CombinedChartViewController: DemoBaseViewController {
         data.bubbleData = generateBubbleData()
         data.scatterData = generateScatterData()
         data.candleData = generateCandleData()
+        for data in data.allData {
+            for dataset in data.dataSets {
+                (dataset as? IBarLineScatterCandleBubbleChartDataSet)?.highlightIcon = UIImage(named: "icon")
+            }
+        }
         
         chartView.xAxis.axisMaximum = data.xMax + 0.25
         
@@ -142,7 +147,6 @@ class CombinedChartViewController: DemoBaseViewController {
         set.drawValuesEnabled = true
         set.valueFont = .systemFont(ofSize: 10)
         set.valueTextColor = UIColor(red: 240/255, green: 238/255, blue: 70/255, alpha: 1)
-        
         set.axisDependency = .left
         
         return LineChartData(dataSet: set)
