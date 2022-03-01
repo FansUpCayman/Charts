@@ -81,11 +81,11 @@ class BarChartViewController: DemoBaseViewController {
         l.verticalAlignment = .bottom
         l.orientation = .horizontal
         l.drawInside = false
-        l.form = .circle
-        l.formSize = 9
+        l.form = .square
+        l.formSize = 20
+        l.enabled = true
         l.font = UIFont(name: "HelveticaNeue-Light", size: 11)!
         l.xEntrySpace = 4
-//        chartView.legend = l
 
         let marker = XYMarkerView(color: UIColor(white: 180/250, alpha: 1),
                                   font: .systemFont(ofSize: 12),

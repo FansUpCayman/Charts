@@ -43,8 +43,8 @@ open class LegendRenderer: Renderer
                 let entryCount = dataSet.entryCount
                 
                 // if we have a barchart with stacked bars
-                if dataSet is IBarChartDataSet &&
-                    (dataSet as! IBarChartDataSet).isStacked
+                if let dataSet = dataSet as? IBarChartDataSet,
+                   dataSet.isStacked
                 {
                     let bds = dataSet as! IBarChartDataSet
                     let sLabels = bds.stackLabels
@@ -71,7 +71,9 @@ open class LegendRenderer: Renderer
                                 formLineWidth: dataSet.formLineWidth,
                                 formLineDashPhase: dataSet.formLineDashPhase,
                                 formLineDashLengths: dataSet.formLineDashLengths,
-                                formColor: clrs[j]
+                                formColor: clrs[j],
+                                formBorderWidth: dataSet.barBorderWidth,
+                                formBorderColor: dataSet.barBorderColor
                             )
                         )
                     }
@@ -88,13 +90,13 @@ open class LegendRenderer: Renderer
                                 formLineWidth: CGFloat.nan,
                                 formLineDashPhase: 0.0,
                                 formLineDashLengths: nil,
-                                formColor: nil
+                                formColor: nil,
+                                formBorderWidth: dataSet.barBorderWidth,
+                                formBorderColor: dataSet.barBorderColor
                             )
                         )
                     }
-                }
-                else if dataSet is IPieChartDataSet
-                {
+                } else if dataSet is IPieChartDataSet {
                     let pds = dataSet as! IPieChartDataSet
                     
                     for j in 0..<min(clrs.count, entryCount)
@@ -128,10 +130,8 @@ open class LegendRenderer: Renderer
                             )
                         )
                     }
-                }
-                else if dataSet is ICandleChartDataSet &&
-                    (dataSet as! ICandleChartDataSet).decreasingColor != nil
-                {
+                } else if dataSet is ICandleChartDataSet &&
+                    (dataSet as! ICandleChartDataSet).decreasingColor != nil {
                     let candleDataSet = dataSet as! ICandleChartDataSet
                     
                     entries.append(
@@ -157,9 +157,7 @@ open class LegendRenderer: Renderer
                             formColor: candleDataSet.increasingColor
                         )
                     )
-                }
-                else
-                { // all others
+                } else { // all others
                     
                     for j in 0..<min(clrs.count, entryCount)
                     {
@@ -183,7 +181,9 @@ open class LegendRenderer: Renderer
                                 formLineWidth: dataSet.formLineWidth,
                                 formLineDashPhase: dataSet.formLineDashPhase,
                                 formLineDashLengths: dataSet.formLineDashLengths,
-                                formColor: clrs[j]
+                                formColor: clrs[j],
+                                formBorderWidth: (dataSet as? IBarChartDataSet)?.barBorderWidth ?? 0,
+                                formBorderColor: (dataSet as? IBarChartDataSet)?.barBorderColor
                             )
                         )
                     }
@@ -519,6 +519,10 @@ open class LegendRenderer: Renderer
         
         let formSize = entry.formSize.isNaN ? legend.formSize : entry.formSize
         
+        let borderWidth = entry.formBorderWidth
+        let borderColor = entry.formBorderColor
+        
+        
         context.saveGState()
         defer { context.restoreGState() }
         
@@ -536,12 +540,23 @@ open class LegendRenderer: Renderer
         case .circle:
             
             context.setFillColor(formColor.cgColor)
-            context.fillEllipse(in: CGRect(x: x, y: y - formSize / 2.0, width: formSize, height: formSize))
-            
+            let ellipseRect = CGRect(x: x, y: y - formSize / 2.0, width: formSize, height: formSize)
+            context.fillEllipse(in: ellipseRect)
+            if let borderColor = borderColor {
+                context.setStrokeColor(borderColor.cgColor)
+                context.setLineWidth(borderWidth)
+                context.strokeEllipse(in: ellipseRect.insetBy(dx: borderWidth/2, dy: borderWidth/2))
+            }
         case .square:
             
             context.setFillColor(formColor.cgColor)
-            context.fill(CGRect(x: x, y: y - formSize / 2.0, width: formSize, height: formSize))
+            let rect = CGRect(x: x, y: y - formSize / 2.0, width: formSize, height: formSize)
+            context.fill(rect)
+            if let borderColor = borderColor {
+                context.setStrokeColor(borderColor.cgColor)
+                context.setLineWidth(borderWidth)
+                context.stroke(rect.insetBy(dx: borderWidth/2, dy: borderWidth/2))
+            }
             
         case .line:
             
