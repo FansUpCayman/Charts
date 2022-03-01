@@ -12,6 +12,14 @@
 import Foundation
 import CoreGraphics
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
+#if canImport(Cocoa)
+import Cocoa
+#endif
+
 @objc
 public protocol IBarLineScatterCandleBubbleChartDataSet: IChartDataSet
 {
@@ -23,5 +31,5 @@ public protocol IBarLineScatterCandleBubbleChartDataSet: IChartDataSet
     var highlightLineWidth: CGFloat { get set }
     var highlightLineDashPhase: CGFloat { get set }
     var highlightLineDashLengths: [CGFloat]? { get set }
-    var highlightIcon: UIImage? { get set }
+    var highlightIcon: NSUIImage? { get set }
 }
