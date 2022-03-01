@@ -812,6 +812,12 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 setHighlightDrawPos(highlight: high, barRect: barRect)
                 
                 context.fill(barRect)
+                
+                if set.highlightBorderWidth > 0 {
+                    context.setStrokeColor(set.highlightBorderColor.cgColor)
+                    context.setLineWidth(set.highlightBorderWidth)
+                    context.stroke(barRect.insetBy(dx: set.highlightBorderWidth/2, dy: set.highlightBorderWidth/2))
+                }
             }
         }
         

@@ -139,6 +139,8 @@ class BarChartViewController: DemoBaseViewController {
             data.barWidth = 0.9
             chartView.data = data
         }
+        set1.highlightBorderWidth = 3
+        set1.highlightBorderColor = .red
         
 //        chartView.setNeedsDisplay()
     }
