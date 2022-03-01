@@ -437,7 +437,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             {
                 context.setStrokeColor(borderColor.cgColor)
                 context.setLineWidth(borderWidth)
-                context.stroke(barRect)
+                context.stroke(barRect.insetBy(dx: borderWidth/2, dy: borderWidth/2))
             }
 
             // Create and append the corresponding accessibility element to accessibilityOrderedElements
