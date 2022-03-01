@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import CoreGraphics
+
 public protocol HighlightIconRenderer: DataRenderer {
     func drawHighlightIcons(context: CGContext, indices: [Highlight])
 }
